@@ -1,0 +1,79 @@
+{% extends "dashboard/basedashboard.html" %}
+{%  block body %}
+    <h6 class="mb-0 text-uppercase">DASHBOARD - <script>document.write(new Date())</script></h6>
+    <hr/>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-5">
+					<div class="col">
+                        <div class="card radius-10">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <p class="mb-0 text-secondary">Revenue</p>
+                                        <h4 class="my-1">Rp {{ sumnilai.nilai_transaksi__sum }}</h4>
+                                    </div>
+                                    <div class="widgets-icons bg-light-success text-success ms-auto"><i class="bx bxs-wallet"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-0 text-secondary">Total Orderan</p>
+                            <h4 class="my-1">{{ countorder }}</h4>
+                        </div>
+                        <div class="widgets-icons bg-light-info text-info ms-auto"><i class='bx bxs-group'></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-0 text-secondary">Orderan Pending</p>
+                            <h4 class="my-1">{{ countorderpending }}</h4>
+                        </div>
+                        <div class="widgets-icons bg-light-danger text-danger ms-auto"><i class='bx bxs-angry'></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-0 text-secondary">Dalam Proses</p>
+                            <h4 class="my-1">{{ countorderproses }}</h4>
+                        </div>
+                        <div class="widgets-icons bg-light-warning text-warning ms-auto"><i class='bx bx-walk
+'></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p class="mb-0 text-secondary">Orderan Selesai</p>
+                            <h4 class="my-1">{{ countorderselesai }}</h4>
+                        </div>
+                        <div class="widgets-icons bg-light-success text-success ms-auto"><i class='lni lni-checkmark-circle'></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr/>
+{% endblock %}

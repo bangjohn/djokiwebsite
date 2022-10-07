@@ -1,0 +1,152 @@
+{% extends "dashboard/basedashboard.html" %}
+{%  block body %}
+<div class="card">
+   <div class="card-body">
+      <div class="d-lg-flex align-items-center mb-4 gap-3">
+         <div class="position-relative">
+            <input type="text" class="form-control ps-5 radius-30" placeholder="Search Order"> <span class="position-absolute top-50 product-show translate-middle-y"><i class="bx bx-search"></i></span>
+         </div>
+         <div class="ms-auto"><a href="{% url 'tambahorderan' %}" class="btn btn-primary radius-30 mt-2 mt-lg-0"><i class="bx bxs-plus-square"></i>Tambah Orderan Baru</a></div>
+      </div>
+      <div class="table-responsive">
+         <table class="table mb-0">
+            <thead class="table-light">
+               <tr>
+                  <th>ID</th>
+                  <th>Tanggal Order</th>
+                  <th>Nomor HP</th>
+                  <th>Nomor ID & Server</th>
+                  <th>Nilai Transaksi</th>
+                  <th>Worker</th>
+                  <th>Tipe</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% if orderan %}
+               {% for order in orderan %}
+               <tr>
+                  <td>
+                     <div class="d-flex align-items-center">
+                        <div class="ms-2">
+                            <a data-bs-toggle="modal" data-bs-target="#verticalmodal{{ order.id }}" href="#">{{ order.id }}</a>
+                        </div>
+                     </div>
+                  </td>
+                  <td>{{ order.tgl_order|date:'d-m-Y H:i:s' }}</td>
+                  <td>
+                     <i class="lni lni-whatsapp"><a href="https://wa.me/{{ order.nomor_hp_customer }}"> {{ order.nomor_hp_customer }}</a></i>
+                  </td>
+                  <td>{{ order.nomor_id_ml }} ({{ order.nomor_server_ml }})</td>
+                  <td>Rp{{ order.nilai_transaksi }}</td>
+                  <td>{{ order.workerid.nama }}</td>
+                  <td>{{ order.produkjasa.nama }}</td>
+                  {% if order.status.keterangan == 'Sedang dikerjakan' %}
+                  <td><span class="badge rounded-pill bg-warning">Process</span></td>
+                  {% elif order.status.keterangan == 'Belum dikerjakan' %}
+                  <td><span class="badge rounded-pill bg-secondary">Pending</span></td>
+                  {% elif order.status.keterangan == 'Selesai' %}
+                  <td><span class="badge rounded-pill bg-success">Done</span></td>
+                  {% else %}
+                  <td><span class="badge rounded-pill bg-danger">{{ order.status.keterangan }}</span></td>
+                  {% endif %}
+                  <td>
+                     <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle rounded-pill" type="button" data-bs-toggle="dropdown" aria-expanded="true">Detail</button>
+                        <ul class="dropdown-menu">
+                           <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#verticalmodal{{ order.id }}">Lihat Detail</a>
+                           </li>
+                           <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalubahstatus{{ order.id }}">Ubah Status</a>
+                           </li>
+                           <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalubahworker{{ order.id }}">Ubah Worker</a>
+                           </li>
+                        </ul>
+                     </div>
+                      <!-- Modal -->
+                      <div class="modal fade" id="verticalmodal{{ order.id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title">Detail Orderan #{{ order.id }}</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <p><b>Tanggal Order</b> : {{ order.tgl_order|date:'d-m-Y H:i:s' }}</p>
+                                      <p><b>Nomor HP</b> : <i class="lni lni-whatsapp"></i> <a href="https://wa.me/{{ order.nomor_hp_customer }}" target="_blank">{{ order.nomor_hp_customer }}</a></p>
+                                      <p><b>Nomor ID & Server</b> : {{ order.nomor_id_ml }} ({{ order.nomor_server_ml }})</p>
+                                      <p><b>Nilai Transaksi</b> : Rp{{ order.nilai_transaksi }}</p>
+                                      <p><b>Worker</b> : {{ order.workerid.nama }}</p>
+                                      <p><b>Tipe</b> : {{ order.produkjasa.nama }}</p>
+                                      <p><b>Status</b> : {{ order.status.keterangan }}</p>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal fade" id="modalubahstatus{{ order.id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title">Ubah Status Orderan #{{ order.id }}</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                      {% if order.status.keterangan == 'Selesai' %}
+                                        <p>Orderan ini sudah selesai, tidak bisa diubah lagi.</p>
+                                        {% else %}
+                                      <form action="{% url 'ubah_status' order.id %}" class="row g-3" method="POST">
+                                          {% csrf_token %}
+                                          {{ formubahstatus.as_p }}
+                                          <p>Status sekarang: {{ order.status.keterangan }}</p>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                       <button type="submit" class="btn btn-primary">Ubah Status</button>
+                                  </div>
+                                      </form>
+                                        {% endif %}
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                      <div class="modal fade" id="modalubahworker{{ order.id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title">Ubah Status Worker #{{ order.id }}</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                      {% if order.status.keterangan == 'Selesai' %}
+                                        <p>Orderan ini sudah selesai, tidak bisa diubah lagi.</p>
+                                      {% else %}
+                                      <form action="{% url 'ubah_worker' order.id %}" class="row g-3" method="POST">
+                                          {% csrf_token %}
+                                          {{ formubahworker.as_p }}
+                                          <p>Worker sekarang: {{ order.workerid.nama }}</p>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                       <button type="submit" class="btn btn-primary">Ubah Status</button>
+                                  </div>
+                                      </form>
+                                        {% endif %}
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                  </td>
+               </tr>
+               {% endfor %}
+               {% else %}
+                   <tr>
+                       <td colspan="7">Tidak ada orderan</td>
+                   </tr>
+               {% endif %}
+            </tbody>
+         </table>
+                  </div>
+   </div>
+</div>
+{% endblock %}

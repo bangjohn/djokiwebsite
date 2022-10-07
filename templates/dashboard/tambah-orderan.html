@@ -1,0 +1,24 @@
+{% extends "dashboard/basedashboard.html" %}
+{%  block body %}
+<div class="row">
+   <div class="col-xl-7 mx-auto">
+      <div class="card border-top border-0 border-4 border-primary">
+         <div class="card-body p-5">
+            <div class="card-title d-flex align-items-center">
+               <div><i class="bx bxs-plus-circle me-1 font-22 text-primary"></i>
+               </div>
+               <h5 class="mb-0 text-primary">Tambah Orderan</h5>
+            </div>
+            <hr>
+            <form action="{% url 'tambahorderan' %}" class="row g-3" method="POST">
+               {% csrf_token %}
+               {{ form.as_p }}
+               <div class="col-12">
+                  <button type="submit" class="btn btn-secondary px-5">Buat Orderan</button>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}
