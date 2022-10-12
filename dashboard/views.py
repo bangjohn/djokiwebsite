@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import *
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -36,7 +36,7 @@ def index(request):
         'countorderselesai': countorderselesai,
     })
 
-
+@login_required(login_url='login')
 def statusorderan(request):
     # inner join worker and order where order.workerid = worker.id
     order = Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by('-tgl_order')
@@ -47,17 +47,16 @@ def statusorderan(request):
         'formubahworker': formubahworker(),
     })
 
-
+@login_required(login_url='login')
 def ubah_status(request, id):
     if request.method == "POST":
         orderid = Order.objects.get(id=id)
         form = formubahstatus(request.POST, instance=orderid)
         if form.is_valid():
             new_status = form.cleaned_data['status']
-            print(str(new_status))
+
             nilai_transaksi = Order.objects.get(id=id).nilai_transaksi
             if str(new_status) == 'Selesai':
-                print('kena disini 1')
                 workernya = Order.objects.select_related('workerid').get(id=id).workerid_id
                 orderannya = Order.objects.get(id=id).id
                 # get nilai_transaksi from dashboard_order tables where id = id store in variable nilai_transaksi and convert to int
@@ -78,7 +77,6 @@ def ubah_status(request, id):
                     'formubahworker': formubahworker(),
             })
             else:
-                print('kena disini 2')
                 Order.objects.filter(id=id).update(status=new_status)
                 return render(request, 'dashboard/status-orderan.html', {
                     'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by(
@@ -86,7 +84,6 @@ def ubah_status(request, id):
                     'formubahstatus': formubahstatus(),
                     'formubahworker': formubahworker(),
                 })
-            print('kena disini 3')
             Order.objects.filter(id=id).update(status=new_status)
             return render(request, 'dashboard/status-orderan.html', {
                 'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by(
@@ -102,7 +99,7 @@ def ubah_status(request, id):
         'formubahworker': formubahworker(),
     })
 
-
+@login_required(login_url='login')
 def ubah_worker(request, id):
     if request.method == "POST":
         orderid = Order.objects.get(id=id)
@@ -125,7 +122,7 @@ def ubah_worker(request, id):
 
     })
 
-
+@login_required(login_url='login')
 def tambahorderan(request):
     if request.method == "POST":
         form = OrderForm(request.POST)
@@ -152,12 +149,40 @@ def tambahorderan(request):
     return render(request, 'dashboard/tambah-orderan.html', {
         'form': OrderForm(),
     })
-
+@login_required(login_url='login')
 def penghasilanworker(request):
     # inner join worker and order where order.workerid = worker.id
     #order = Order.objects.select_related('workerid', 'produkjasa', 'status').all().filter(status=3).order_by('-tgl_order')
     # inner join worker and dashboard_pendapatanworker where dashboard_pendapatanworker.workerid = worker.id
     pendapatan = PendapatanWorker.objects.select_related('workerid', 'orderanid').all().order_by('-tgl_transaksi')
+    hitungpendatapan = PendapatanWorker.objects.select_related('workerid', 'orderanid').all().aggregate(Sum('nilai_komisi'))
+    countorderselesai = Order.objects.filter(status=3).count()
     return render(request, 'dashboard/penghasilan-worker.html', {
         'pendapatan': pendapatan,
+        'countorderselesai': countorderselesai,
+        'hitungpendatapan': hitungpendatapan,
     })
+
+@login_required(login_url='login')
+def pembayarankomisi(request):
+    if request.method == "POST":
+        form = formpembayarankomisi(request.POST)
+        if form.is_valid():
+            new_nomor_rekening = form.cleaned_data['nomor_rekening']
+            new_nama_bank = form.cleaned_data['nama_bank']
+            new_nama_pemilik_rekening = form.cleaned_data['nama_pemilik_rekening']
+            new_nilai_komisi = form.cleaned_data['nilai_komisi']
+            new_status = form.cleaned_data['status']
+            new_pendapatan = PendapatanWorker(nomor_rekening=new_nomor_rekening, nama_bank=new_nama_bank,
+                                              nama_pemilik_rekening=new_nama_pemilik_rekening,
+                                              nilai_komisi=new_nilai_komisi, status=new_status)
+            new_pendapatan.save()
+            return render(request, 'dashboard/pembayaran-komisi.html', {
+                'form': formpembayarankomisi(),
+            })
+        else:
+            return HttpResponse("Form is not valid")
+    totalkomisiperworker = PendapatanWorker.objects.select_related('workerid').values('workerid').annotate(namaworker=F('workerid__nama'),total=Sum('nilai_komisi'))
+    konteks = {'totalkomisi': totalkomisiperworker}
+    # print(totalkomisiperworker.query)
+    return render(request, 'dashboard/pembayaran-komisi.html', konteks)

@@ -57,4 +57,4 @@ class PendapatanWorker(models.Model):
     tgl_transaksi = models.DateTimeField(auto_now_add=True)
     nilai_komisi = models.IntegerField()
     def __str__(self):
-        return 'PendapatanWorker %s' % (self.nilai_komisi)
+        return '%s' % (self.nilai_komisi, self.workerid, self.orderanid)
