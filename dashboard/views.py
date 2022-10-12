@@ -2,7 +2,7 @@ from django.db.models import *
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from .models import Order, Worker, ProdukJasa, statusorderan, PendapatanWorker
+from .models import Order, Worker, ProdukJasa, statusorderan, PendapatanWorker, TransaksiWithdraw
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import datetime
 import json
 import requests
-from .forms import OrderForm, formubahstatus, formubahworker
+from .forms import OrderForm, formubahstatus, formubahworker, formwithdrawworker
 
 # Create your views here.
 
@@ -69,6 +69,7 @@ def ubah_status(request, id):
                 PendapatanWorker.objects.create(workerid=Worker.objects.get(id=workernya),
                                                 orderanid=Order.objects.get(id=orderannya),
                                                 nilai_komisi=komisi,)
+                Worker.objects.filter(id=workernya).update(pendapatankomisi=F('pendapatankomisi') + komisi)
                 Order.objects.filter(id=id).update(status=new_status)
                 return render(request, 'dashboard/status-orderan.html', {
                     'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by(
@@ -166,23 +167,25 @@ def penghasilanworker(request):
 @login_required(login_url='login')
 def pembayarankomisi(request):
     if request.method == "POST":
-        form = formpembayarankomisi(request.POST)
+        form = formwithdrawworker(request.POST)
         if form.is_valid():
-            new_nomor_rekening = form.cleaned_data['nomor_rekening']
-            new_nama_bank = form.cleaned_data['nama_bank']
-            new_nama_pemilik_rekening = form.cleaned_data['nama_pemilik_rekening']
-            new_nilai_komisi = form.cleaned_data['nilai_komisi']
-            new_status = form.cleaned_data['status']
-            new_pendapatan = PendapatanWorker(nomor_rekening=new_nomor_rekening, nama_bank=new_nama_bank,
-                                              nama_pemilik_rekening=new_nama_pemilik_rekening,
-                                              nilai_komisi=new_nilai_komisi, status=new_status)
-            new_pendapatan.save()
+            idworker = form.data['workerid']
+            new_workerid = form.cleaned_data['workerid']
+            new_nilai_transaksi = form.cleaned_data['nilai_transaksi']
+            new_pembayarankomisi = TransaksiWithdraw(workerid=new_workerid, nilai_transaksi=new_nilai_transaksi)
+            updatekomisi = Worker.objects.filter(id=idworker).update(pendapatankomisi=0)
+            new_pembayarankomisi.save()
             return render(request, 'dashboard/pembayaran-komisi.html', {
-                'form': formpembayarankomisi(),
+                'worker': Worker.objects.all().values('id','nama', 'pendapatankomisi'),
+                'form': formwithdrawworker(),
             })
         else:
             return HttpResponse("Form is not valid")
-    totalkomisiperworker = PendapatanWorker.objects.select_related('workerid').values('workerid').annotate(namaworker=F('workerid__nama'),total=Sum('nilai_komisi'))
-    konteks = {'totalkomisi': totalkomisiperworker}
+    # select from dashboard_worker only nama and pendapatankomisi coloumn
+    worker = Worker.objects.all().values('id','nama', 'pendapatankomisi')
+    # totalkomisiperworker = Worker.objects.annotate(namaworker=F('nama'), pendapatankomisi=F('pendapatankomisi'))
+    # totalkomisiperworker = PendapatanWorker.objects.select_related('workerid').values('workerid').annotate(idworker=F('workerid__id'),namaworker=F('workerid__nama'),total=Sum('nilai_komisi'))
+    # konteks = {'totalkomisi': totalkomisiperworker, 'form': formwithdrawworker()}
+    konteks = {'form': formwithdrawworker(), 'worker': worker}
     # print(totalkomisiperworker.query)
     return render(request, 'dashboard/pembayaran-komisi.html', konteks)

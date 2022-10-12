@@ -1,5 +1,5 @@
 from django import forms
-from .models import Order, Worker, ProdukJasa, statusorderan
+from .models import Order, Worker, ProdukJasa, statusorderan, TransaksiWithdraw
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -47,4 +47,16 @@ class formubahworker(forms.ModelForm):
         }
         widgets = {
             'workerid': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class formwithdrawworker(forms.ModelForm):
+    class Meta:
+        model = TransaksiWithdraw
+        fields = ['workerid', 'nilai_transaksi']
+        labels = {
+            'workerid': 'worker', 'nilai_transaksi': 'nilaitransaksi',
+        }
+        widgets = {
+            'workerid': forms.HiddenInput(attrs={'class': 'form-control', 'type': 'number'}),
+            'nilai_transaksi': forms.HiddenInput(attrs={'class': 'form-control', 'type': 'number'}),
         }

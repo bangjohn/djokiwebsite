@@ -12,13 +12,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if totalkomisi %}
-                    {% for totalkomisi in totalkomisi %}
+                    {% if worker %}
+                    {% for worker in worker %}
                     <tr>
-                        <td>{{ totalkomisi.namaworker }}</td>
-                        <td>{{ totalkomisi.total }}</td>
-                    <td>
-                            <button type="button" class="btn btn-primary"><i class='bx bx-money mr-1'></i>Bayar</button>
+                        <td>{{ worker.nama }}</td>
+                        <td>{{ worker.pendapatankomisi }}</td>
+                        <td>
+                            <form action="{% url 'pembayarankomisi' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="{{ form.workerid.name }}" class="form-control" value="{{ worker.id }}">
+                                <input type="hidden" name="{{ form.nilai_transaksi.name }}" class="form-control" value="{{ worker.pendapatankomisi }}">
+                                <button type="submit" class="btn btn-primary"><i class='bx bx-money mr-1'></i>Bayar</button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                     {% else %}

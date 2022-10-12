@@ -21,7 +21,7 @@ class Worker(models.Model):
     nomor_hp = models.CharField(max_length=15)
     pendapatankomisi = models.IntegerField()
     def __str__(self):
-        return 'Worker %s' % (self.nama)
+        return f'{self.nama}'
 
 class ProdukJasa(models.Model):
     nama = models.CharField(max_length=15, blank=True, null=True)
