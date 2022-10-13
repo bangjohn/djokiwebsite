@@ -83,3 +83,27 @@ class formtambahprodukjasa(forms.ModelForm):
             'nama': forms.TextInput(attrs={'class': 'form-control'}),
             'komisi': forms.TextInput(attrs={'class': 'form-control', 'type': 'number'})
         }
+
+class formubahworker(forms.ModelForm):
+    class Meta:
+        model = Worker
+        fields = ['nama', 'nomor_hp']
+        labels = {
+            'nama': 'Nama', 'nomor_hp': 'Nomor HP'
+        }
+        widgets = {
+            'nama': forms.TextInput(attrs={'class': 'form-control'}),
+            'nomor_hp': forms.TextInput(attrs={'class': 'form-control', 'type': 'number'})
+        }
+
+class formtambahworker(forms.ModelForm):
+    class Meta:
+        model = Worker
+        fields = ['nama', 'nomor_hp']
+        labels = {
+            'nama': 'Nama', 'nomor_hp': 'Nomor HP'
+        }
+        widgets = {
+            'nama': forms.TextInput(attrs={'class': 'form-control'}),
+            'nomor_hp': forms.TextInput(attrs={'class': 'form-control', 'type': 'number'})
+        }

@@ -15,4 +15,8 @@ urlpatterns = [
     path('atur-komisi', views.aturkomisi, name='aturkomisi'),
     path('tambah-produk-jasa', views.tambahprodukjasa, name='tambahprodukjasa'),
     path('hapusprodukjasa/<int:id>', views.hapusprodukjasa, name='hapusprodukjasa'),
+    path('worker', views.listworker, name='worker'),
+    path('editworker/<int:id>', views.editworker, name='editworker'),
+    path('tambahworker', views.tambahworker, name='tambahworker'),
+    path('hapusworker/<int:id>', views.hapusworker, name='hapusworker'),
     ]

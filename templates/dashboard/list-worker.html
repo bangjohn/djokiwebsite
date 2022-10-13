@@ -1,0 +1,83 @@
+{% extends "dashboard/basedashboard.html" %}
+{% block body %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table mb-0">
+            <div class="ms-auto">
+                    <a href="#" class="btn btn-primary radius-30 mt-2 mt-lg-0" data-bs-target="#modaltambahworker" data-bs-toggle="modal"><i class="bx bxs-plus-square"></i>Tambah Worker</a>
+                </div>
+                <thead class="table-light">
+                    <tr>
+                        <th>Worker</th>
+                        <th>Nomor HP</th>
+                        <th>Pendapatan Komisi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if worker %}
+                    {% for worker in worker %}
+                    <tr>
+                        <td>{{ worker.nama }}</td>
+                        <td>{{ worker.nomor_hp }}</td>
+                        <td>{{ worker.pendapatankomisi }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modaleditworker{{ worker.id }}">Edit</a>
+                            <a href="{% url 'hapusworker' worker.id %}" class="btn btn-sm btn-danger">Hapus</a>
+                        </td>
+                    </tr>
+                        <div class="modal fade" id="modaleditworker{{ worker.id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title">Edit Worker #{{ worker.nama }}</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                        <form action="{% url 'editworker' worker.id  %}" method="POST">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="nama" class="form-label">Nama</label>
+                                                <input type="text" class="form-control" id="nama" name="nama" value="{{ worker.nama }}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="nomor_hp" class="form-label">Nomor HP</label>
+                                                <input type="text" class="form-control" id="nomor_hp" name="nomor_hp" value="{{ worker.nomor_hp }}">
+                                            </div>
+                                            <input type="hidden" name="id" value="{{ worker.id }}">
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </form>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="7">Tidak ada Worker</td>
+                    </tr>
+                    {% endif %}
+                <div class="modal fade" id="modaltambahworker" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title">Tambah Worker</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                        <form action="{% url 'tambahworker' %}" method="POST">
+                                            {% csrf_token %}
+                                            {{ formtambahworker.as_p }}
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </form>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

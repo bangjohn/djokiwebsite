@@ -152,6 +152,50 @@ def tambahorderan(request):
     return render(request, 'dashboard/tambah-orderan.html', {
         'form': OrderForm(),
     })
+
+@login_required(login_url='login')
+def listworker(request):
+    worker = Worker.objects.all().values('id', 'nama', 'nomor_hp', 'pendapatankomisi')
+    return render(request, 'dashboard/list-worker.html', {
+        'worker': worker,
+        'formubahworker': formubahworker(),
+        'formtambahworker': formtambahworker(),
+    })
+
+@login_required(login_url='login')
+def tambahworker(request):
+    if request.method == "POST":
+        form = formtambahworker(request.POST)
+        if form.is_valid():
+            new_nama = form.cleaned_data['nama']
+            new_nomor_hp = form.cleaned_data['nomor_hp']
+            new_worker = Worker(nama=new_nama, nomor_hp=new_nomor_hp,pendapatankomisi=0)
+            new_worker.save()
+            return HttpResponseRedirect(reverse('worker'))
+        else:
+            return HttpResponse("Form is not valid")
+    return HttpResponseRedirect(reverse('worker'))
+
+
+@login_required(login_url='login')
+def editworker(request, id):
+    if request.method == "POST":
+        workerid = Worker.objects.get(id=id)
+        form = formubahworker(request.POST, instance=workerid)
+        if form.is_valid():
+            new_nama = form.cleaned_data['nama']
+            new_nomor_hp = form.cleaned_data['nomor_hp']
+            Worker.objects.filter(id=id).update(nama=new_nama, nomor_hp=new_nomor_hp)
+            return HttpResponseRedirect(reverse('worker'))
+        else:
+            return HttpResponse("Form is not valid")
+    return HttpResponseRedirect(reverse('worker'))
+
+@login_required(login_url='login')
+def hapusworker(request, id):
+    Worker.objects.filter(id=id).delete()
+    return HttpResponseRedirect(reverse('worker'))
+
 @login_required(login_url='login')
 def penghasilanworker(request):
     # inner join worker and order where order.workerid = worker.id
@@ -231,5 +275,5 @@ def tambahprodukjasa(request):
 
 @login_required(login_url='login')
 def hapusprodukjasa(request, id):
-    hapusprodukjasa = ProdukJasa.objects.filter(id=id).delete()
+    ProdukJasa.objects.filter(id=id).delete()
     return HttpResponseRedirect(reverse('aturkomisi'))
