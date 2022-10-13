@@ -24,7 +24,7 @@ class Worker(models.Model):
         return f'{self.nama}'
 
 class ProdukJasa(models.Model):
-    nama = models.CharField(max_length=15, blank=True, null=True)
+    nama = models.CharField(max_length=50, blank=True, null=True)
     komisi = models.IntegerField()
     def __str__(self):
         return '%s' % (self.nama)

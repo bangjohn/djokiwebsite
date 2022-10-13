@@ -13,4 +13,6 @@ urlpatterns = [
     path('account/', include('django.contrib.auth.urls'), name='logout'),
     path('pembayaran-komisi', views.pembayarankomisi, name='pembayarankomisi'),
     path('atur-komisi', views.aturkomisi, name='aturkomisi'),
+    path('tambah-produk-jasa', views.tambahprodukjasa, name='tambahprodukjasa'),
+    path('hapusprodukjasa/<int:id>', views.hapusprodukjasa, name='hapusprodukjasa'),
     ]

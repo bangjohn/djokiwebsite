@@ -2,6 +2,8 @@ from django.db.models import *
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.urls import reverse
+
 from .models import Order, Worker, ProdukJasa, statusorderan, PendapatanWorker, TransaksiWithdraw
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -201,6 +203,7 @@ def aturkomisi(request):
             return render(request, 'dashboard/atur-komisi.html', {
                 'listprodukjasa': ProdukJasa.objects.all().values('id', 'nama', 'komisi'),
                 'form': formrubahkomisiprodukjasa(),
+                'formtambahprodukjasa': formtambahprodukjasa(),
             })
         else:
             return HttpResponse("Form is not valid")
@@ -209,4 +212,24 @@ def aturkomisi(request):
     return render(request, 'dashboard/atur-komisi.html', {
         'listprodukjasa': listprodukjasa,
         'form': form,
+        'formtambahprodukjasa': formtambahprodukjasa(),
     })
+
+@login_required(login_url='login')
+def tambahprodukjasa(request):
+    if request.method == "POST":
+        form = formtambahprodukjasa(request.POST)
+        if form.is_valid():
+            new_nama = form.cleaned_data['nama']
+            new_komisi = form.cleaned_data['komisi']
+            new_produkjasa = ProdukJasa(nama=new_nama, komisi=new_komisi)
+            new_produkjasa.save()
+            return HttpResponseRedirect(reverse('aturkomisi'))
+        else:
+            return HttpResponse("Form is not valid")
+    return HttpResponseRedirect(reverse('aturkomisi'))
+
+@login_required(login_url='login')
+def hapusprodukjasa(request, id):
+    hapusprodukjasa = ProdukJasa.objects.filter(id=id).delete()
+    return HttpResponseRedirect(reverse('aturkomisi'))

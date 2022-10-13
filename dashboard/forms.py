@@ -71,3 +71,15 @@ class formrubahkomisiprodukjasa(forms.ModelForm):
         widgets = {
             'komisi': forms.TextInput(attrs={'class': 'form-control', 'type': 'number'})
         }
+
+class formtambahprodukjasa(forms.ModelForm):
+    class Meta:
+        model = ProdukJasa
+        fields = ['nama', 'komisi']
+        labels = {
+            'nama': 'Produk/Jasa', 'komisi': 'Komisi'
+        }
+        widgets = {
+            'nama': forms.TextInput(attrs={'class': 'form-control'}),
+            'komisi': forms.TextInput(attrs={'class': 'form-control', 'type': 'number'})
+        }
