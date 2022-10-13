@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import datetime
 import json
 import requests
-from .forms import OrderForm, formubahstatus, formubahworker, formwithdrawworker
+from .forms import *
 
 # Create your views here.
 
@@ -189,3 +189,24 @@ def pembayarankomisi(request):
     konteks = {'form': formwithdrawworker(), 'worker': worker}
     # print(totalkomisiperworker.query)
     return render(request, 'dashboard/pembayaran-komisi.html', konteks)
+
+@login_required(login_url='login')
+def aturkomisi(request):
+    if request.method == "POST":
+        form = formrubahkomisiprodukjasa(request.POST)
+        if form.is_valid():
+            idprodukjasa = form.data['idprodukjasa']
+            new_komisi = form.cleaned_data['komisi']
+            updatekomisi = ProdukJasa.objects.filter(id=idprodukjasa).update(komisi=new_komisi)
+            return render(request, 'dashboard/atur-komisi.html', {
+                'listprodukjasa': ProdukJasa.objects.all().values('id', 'nama', 'komisi'),
+                'form': formrubahkomisiprodukjasa(),
+            })
+        else:
+            return HttpResponse("Form is not valid")
+    listprodukjasa = ProdukJasa.objects.all().values('id', 'nama', 'komisi')
+    form = formrubahkomisiprodukjasa()
+    return render(request, 'dashboard/atur-komisi.html', {
+        'listprodukjasa': listprodukjasa,
+        'form': form,
+    })

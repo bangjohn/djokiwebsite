@@ -60,3 +60,14 @@ class formwithdrawworker(forms.ModelForm):
             'workerid': forms.HiddenInput(attrs={'class': 'form-control', 'type': 'number'}),
             'nilai_transaksi': forms.HiddenInput(attrs={'class': 'form-control', 'type': 'number'}),
         }
+
+class formrubahkomisiprodukjasa(forms.ModelForm):
+    class Meta:
+        model = ProdukJasa
+        fields = ['komisi']
+        labels = {
+            'komisi': 'Komisi'
+        }
+        widgets = {
+            'komisi': forms.TextInput(attrs={'class': 'form-control', 'type': 'number'})
+        }
