@@ -38,7 +38,7 @@ class formubahstatus(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-control'}),
         }
 
-class formubahworker(forms.ModelForm):
+class formubahworkerorderan(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['workerid']

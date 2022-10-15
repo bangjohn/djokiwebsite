@@ -46,7 +46,7 @@ def statusorderan(request):
     return render(request, 'dashboard/status-orderan.html', {
         'orderan': order,
         'formubahstatus': formubahstatus(),
-        'formubahworker': formubahworker(),
+        'formubahworkerorderan': formubahworkerorderan(),
     })
 
 @login_required(login_url='login')
@@ -77,7 +77,7 @@ def ubah_status(request, id):
                     'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by(
                         '-tgl_order'),
                     'formubahstatus': formubahstatus(),
-                    'formubahworker': formubahworker(),
+                    'formubahworkerorderan': formubahworkerorderan(),
             })
             else:
                 Order.objects.filter(id=id).update(status=new_status)
@@ -85,28 +85,28 @@ def ubah_status(request, id):
                     'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by(
                         '-tgl_order'),
                     'formubahstatus': formubahstatus(),
-                    'formubahworker': formubahworker(),
+                    'fformubahworkerorderan': formubahworkerorderan(),
                 })
             Order.objects.filter(id=id).update(status=new_status)
             return render(request, 'dashboard/status-orderan.html', {
                 'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by(
                     '-tgl_order'),
                 'formubahstatus': formubahstatus(),
-                'formubahworker': formubahworker(),
+                'formubahworkerorderan': formubahworkerorderan(),
             })
         else:
             return HttpResponse("Form is not valid")
     return render(request, 'dashboard/status-orderan.html', {
         'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by('-tgl_order'),
         'formubahstatus': formubahstatus(),
-        'formubahworker': formubahworker(),
+        'formubahworkerorderan': formubahworkerorderan(),
     })
 
 @login_required(login_url='login')
 def ubah_worker(request, id):
     if request.method == "POST":
         orderid = Order.objects.get(id=id)
-        form = formubahworker(request.POST, instance=orderid)
+        form = formubahworkerorderan(request.POST, instance=orderid)
         if form.is_valid():
             new_worker = form.cleaned_data['workerid']
             Order.objects.filter(id=id).update(workerid=new_worker)
@@ -114,14 +114,14 @@ def ubah_worker(request, id):
                 'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by(
                     '-tgl_order'),
                 'formubahstatus': formubahstatus(),
-                'formubahworker': formubahworker(),
+                'formubahworkerorderan': formubahworkerorderan(),
             })
         else:
             return HttpResponse("Form is not valid")
     return render(request, 'dashboard/status-orderan.html', {
         'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by('-tgl_order'),
         'formubahstatus': formubahstatus(),
-        'formubahworker': formubahworker(),
+        'formubahworkerorderan': formubahworkerorderan(),
 
     })
 
@@ -145,7 +145,7 @@ def tambahorderan(request):
             return render(request, 'dashboard/status-orderan.html', {
                 'orderan': Order.objects.select_related('workerid', 'produkjasa', 'status').all().order_by('-tgl_order'),
                 'formubahstatus': formubahstatus(),
-                'formubahworker': formubahworker(),
+                'formubahworkerorderan': formubahworkerorderan(),
             })
         else:
             return HttpResponse("Form is not valid")
